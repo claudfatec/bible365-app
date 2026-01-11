@@ -1,0 +1,8 @@
+# Manipulação de dados
+pandas==2.1.4
+
+# Testes automatizados
+pytest==7.4.3
+
+# Utilitários
+python-dotenv==1.0.0
