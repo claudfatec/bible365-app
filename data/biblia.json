@@ -1,0 +1,9 @@
+[
+    {"livro": "Gênesis", "capitulos": 50},
+    {"livro": "Êxodo", "capitulos": 40},
+    {"livro": "Levítico", "capitulos": 27},
+    {"livro": "Números", "capitulos": 36},
+    {"livro": "Deuteronômio", "capitulos": 34},
+    {"livro": "Josué", "capitulos": 24},
+    {"livro": "Juízes", "capitulos": 21}
+]
