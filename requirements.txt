@@ -1,8 +1,5 @@
-# Manipulação de dados
-pandas==2.1.4
-
-# Testes automatizados
-pytest==7.4.3
-
-# Utilitários
-python-dotenv==1.0.0
+# Versões modernas com suporte a Wheels no Windows
+pandas>=2.2.0
+streamlit>=1.30.0
+pytest>=7.4.3
+python-dotenv>=1.0.0

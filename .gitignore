@@ -1,0 +1,26 @@
+# --- Ambiente Virtual ---
+venv/
+env/
+.env
+ENV/
+
+# --- Python (Arquivos compilados e cache) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# --- Streamlit (Configurações e logs) ---
+.streamlit/config.toml
+static/
+
+# --- VS Code (Configurações locais de editor) ---
+.vscode/
+.history/
+
+# --- Dados e Temporários (Opcional) ---
+# Se você for usar um arquivo de progresso que não quer subir para o Git:
+progresso_usuario.json
+*.log
+.DS_Store
