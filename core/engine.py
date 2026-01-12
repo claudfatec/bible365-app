@@ -1,34 +1,43 @@
 import json
+import math
 
-def gerar_cronograma_completo():
+def gerar_cronograma_resumido():
     with open('data/biblia.json', 'r', encoding='utf-8') as f:
         livros = json.load(f)
 
-    # Criamos uma lista linear de todos os capítulos: [("Gênesis", 1), ("Gênesis", 2)...]
+    # Criamos a lista linear de capítulos
     todos_capitulos = []
     for livro in livros:
         for cap in range(1, livro['capitulos'] + 1):
             todos_capitulos.append(f"{livro['livro']} {cap}")
 
     total_caps = len(todos_capitulos)
-    caps_por_dia = total_caps / 365
+    dias_plano = 365
     cronograma = {}
 
-    for dia in range(1, 366):
-        # Calculamos o índice de início e fim para este dia
-        inicio = int((dia - 1) * caps_por_dia)
-        fim = int(dia * caps_por_dia)
+    for dia in range(1, dias_plano + 1):
+        inicio_idx = math.floor((dia - 1) * (total_caps / dias_plano))
+        fim_idx = math.floor(dia * (total_caps / dias_plano))
         
-        # O último dia pega qualquer arredondamento restante
-        if dia == 365:
-            fim = total_caps
-            
-        cronograma[dia] = todos_capitulos[inicio:fim]
+        # Ajuste para garantir que sempre haja progresso se houver capítulos disponíveis
+        if inicio_idx == fim_idx and inicio_idx < total_caps:
+            fim_idx = inicio_idx + 1
+        
+        caps_do_dia = todos_capitulos[inicio_idx:fim_idx]
+        
+        if caps_do_dia:
+            primeiro = caps_do_dia[0]
+            ultimo = caps_do_dia[-1]
+            if primeiro == ultimo:
+                cronograma[dia] = primeiro
+            else:
+                cronograma[dia] = f"{primeiro} a {ultimo}"
+        else:
+            cronograma[dia] = "Leitura concluída ou sem capítulos para este período"
 
     return cronograma
 
-# Testando o resultado
 if __name__ == "__main__":
-    plano = gerar_cronograma_completo()
-    print(f"Dia 1: {', '.join(plano[1])}")
-    print(f"Dia 2: {', '.join(plano[2])}")
+    plano = gerar_cronograma_resumido()
+    print(f"Dia 1: {plano[1]}")
+    print(f"Dia 2: {plano[2]}")
