@@ -1,23 +1,26 @@
 import streamlit as st
-from core.engine import gerar_cronograma_resumido
+from core.engine import gerar_cronograma_completo
 
-# Configuração da página
-st.set_page_config(page_title="Bible365 MVP", page_icon="📖")
+st.set_page_config(page_title="Bible365", page_icon="📖")
 
-st.title("📖 Meu Plano de Leitura 365 Dias")
-st.subheader("Protótipo de Teste")
+st.title("📖 Bible365: Checklist")
 
-# Carrega o cronograma
-with st.spinner('Gerando seu plano anual...'):
-    plano = gerar_cronograma_resumido()
+# Gerar o plano
+plano = gerar_cronograma_completo()
 
-# Interface de usuário
-dia_selecionado = st.number_input("Digite o dia da jornada (1-365):", min_value=1, max_value=365, value=1)
+dia = st.number_input("Selecione o Dia", min_value=1, max_value=365, value=1)
+capitulos_do_dia = plano.get(dia, [])
 
-st.info(f"📅 **Para o Dia {dia_selecionado}, sua leitura é:**")
-st.header(plano[dia_selecionado])
+st.subheader(f"Leitura do Dia {dia}")
 
-# Simulação de Checkbox de progresso
-if st.checkbox("Marcar leitura de hoje como concluída"):
+# Checklist
+progresso = []
+for cap in capitulos_do_dia:
+    # O 'key' ajuda o Streamlit a manter o estado do checkbox
+    check = st.checkbox(cap, key=f"chk_{dia}_{cap}")
+    progresso.append(check)
+
+# Validação de conclusão
+if len(progresso) > 0 and all(progresso):
     st.success("Parabéns! Progresso salvo (simulação).")
     st.balloons()
