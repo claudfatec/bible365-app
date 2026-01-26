@@ -1,26 +1,19 @@
 import json
-import math
+import os
 
-def gerar_cronograma_completo(): # <--- Nome padronizado aqui
-    with open('data/biblia.json', 'r', encoding='utf-8') as f:
-        livros = json.load(f)
+CAMINHO_JORNADA = os.path.join('data', 'jornada.json')
+CAMINHO_SAVE = os.path.join('data', 'save.txt')
 
-    todos_capitulos = []
-    for livro in livros:
-        for cap in range(1, livro['capitulos'] + 1):
-            todos_capitulos.append(f"{livro['livro']} {cap}")
+def carregar_jornada():
+    with open(CAMINHO_JORNADA, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
-    total_caps = len(todos_capitulos)
-    cronograma = {}
+def carregar_progresso():
+    if os.path.exists(CAMINHO_SAVE):
+        with open(CAMINHO_SAVE, 'r') as f:
+            return int(f.read())
+    return 1 # Começa no dia 1 se não houver progresso salvo
 
-    for dia in range(1, 366):
-        inicio = math.floor((dia - 1) * (total_caps / 365))
-        fim = math.floor(dia * (total_caps / 365))
-        
-        # Garante que o dia sempre tenha conteúdo se houver capítulos
-        if inicio == fim and inicio < total_caps:
-            fim = inicio + 1
-            
-        cronograma[dia] = todos_capitulos[inicio:fim]
-
-    return cronograma
+def salvar_progresso(dia):
+    with open(CAMINHO_SAVE, 'w') as f:
+        f.write(str(dia))
