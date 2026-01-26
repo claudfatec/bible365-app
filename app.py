@@ -1,48 +1,36 @@
 import streamlit as st
-from core.engine import carregar_jornada, carregar_progresso, salvar_progresso
+from core.engine import carregar_jornada, carregar_progresso, salvar_progresso, expandir_trecho
 
-st.set_page_config(page_title="Bible365 Journey", page_icon="📖")
-
-# Título e Progresso
-st.title("📖 Minha Jornada Bíblica")
+st.set_page_config(page_title="Bible365", page_icon="📖")
 
 jornada = carregar_jornada()
 dia_atual = carregar_progresso()
-total_dias = len(jornada)
 
-# Barra de Progresso Visual
-progresso_percent = (dia_atual - 1) / total_dias
-st.progress(progresso_percent)
-st.write(f"Você completou **{int(progresso_percent*100)}%** da jornada (Dia {dia_atual} de {total_dias})")
+st.title(f"📖 Dia {dia_atual}")
 
-st.divider()
-
-# Conteúdo do Dia
-if dia_atual <= total_dias:
+if dia_atual <= len(jornada):
     texto_dia = jornada[dia_atual - 1]
-    # Transforma a string de trechos em uma lista para o checklist
-    trechos = [t.strip() for t in texto_dia.split(',')]
+    trechos_brutos = [t.strip() for t in texto_dia.split(',')]
     
-    st.subheader(f"Leituras para o Dia {dia_atual}:")
+    # Nova lógica: Expande os trechos antes de mostrar
+    todos_capitulos = []
+    for t in trechos_brutos:
+        todos_capitulos.extend(expandir_trecho(t))
     
-    # Gerar checklists individuais
+    st.write("Sua lista de leitura detalhada:")
+    
+    # Gerar checkboxes para cada capítulo expandido
     concluidos = []
-    for trecho in trechos:
-        check = st.checkbox(f"Ler {trecho}", key=f"dia{dia_atual}_{trecho}")
+    for cap in todos_capitulos:
+        check = st.checkbox(f"Leia {cap}", key=f"d{dia_atual}_{cap}")
         concluidos.append(check)
     
     st.divider()
     
-    # Botão para avançar de dia
     if all(concluidos):
-        if st.button("Finalizar Dia e Avançar ➔"):
+        if st.button("Concluir Dia e Avançar ➔"):
             salvar_progresso(dia_atual + 1)
             st.balloons()
             st.rerun()
     else:
-        st.info("Marque todos os trechos acima para concluir o dia.")
-else:
-    st.success("🎉 Parabéns! Você completou todo o plano de leitura!")
-    if st.button("Reiniciar Jornada"):
-        salvar_progresso(1)
-        st.rerun()
+        st.info(f"Faltam {concluidos.count(False)} capítulos para terminar hoje!")
