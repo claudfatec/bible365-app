@@ -1,0 +1,28 @@
+scripts.sh
+# --- Ambiente Virtual (Essencial) ---
+# Nunca suba a pasta venv, ela é gigante e específica para o seu PC
+venv/
+env/
+.env
+
+# --- Python (Caches e Arquivos Temporários) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# --- Streamlit (Configurações Locais) ---
+# Impede que suas configurações de tema ou porta local vazem
+.streamlit/config.toml
+static/
+
+# --- Persistência de Dados (Opcional, mas recomendado) ---
+# Como você criou o Reset de Jornada, talvez queira que cada pessoa
+# que baixe seu código comece do dia 1, sem ver o SEU progresso.
+data/save.txt
+
+# --- Editores e Sistema Operacional ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
