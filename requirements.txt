@@ -1,2 +1,2 @@
 streamlit>=1.30.0
-# Removidos pandas e dotenv para acelerar o deploy e economizar recursos
+pytest>=7.4.0
