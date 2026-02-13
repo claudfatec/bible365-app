@@ -1,0 +1,35 @@
+name: Bible365 CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Validate JSON Syntax
+      run: |
+        # Um pequeno script inline para garantir que seu jornada.json está correto
+        python -c "import json; json.load(open('data/jornada.json'))"
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # Para o build se houver erros de sintaxe Python
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
