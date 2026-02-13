@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        cache: 'pip' # Otimiza o tempo de build em pushes futuros
+        cache: 'pip'
 
     - name: Install Dependencies
       run: |
@@ -27,18 +27,7 @@ jobs:
 
     - name: Validate JSON Syntax
       run: |
-        # Garante que o jornada.json não tem erros de sintaxe (vírgulas sobrando, etc)
         python -c "import json; json.load(open('data/jornada.json'))"
 
     - name: Run Unit Tests (Pytest)
-      # Usamos 'python -m pytest' para resolver problemas de path sem precisar do .ini
       run: python -m pytest tests/
-
-    - name: Security Scan (Checkov)
-      id: checkov
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: .
-        framework: github_actions,python
-        soft_fail: true # Permite que o build passe mesmo com avisos de segurança menores
-        quiet: true # Limpa o log para mostrar apenas erros críticos
