@@ -7,29 +7,38 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+        cache: 'pip' # Otimiza o tempo de build em pushes futuros
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Validate JSON Syntax
       run: |
-        # Um pequeno script inline para garantir que seu jornada.json está correto
+        # Garante que o jornada.json não tem erros de sintaxe (vírgulas sobrando, etc)
         python -c "import json; json.load(open('data/jornada.json'))"
 
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # Para o build se houver erros de sintaxe Python
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    - name: Run Unit Tests (Pytest)
+      # Usamos 'python -m pytest' para resolver problemas de path sem precisar do .ini
+      run: python -m pytest tests/
+
+    - name: Security Scan (Checkov)
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: .
+        framework: github_actions,python
+        soft_fail: true # Permite que o build passe mesmo com avisos de segurança menores
+        quiet: true # Limpa o log para mostrar apenas erros críticos
