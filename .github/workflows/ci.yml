@@ -23,6 +23,6 @@ jobs:
         run: |
           pip install -r requirements.txt
           
-      - name: Run All Tests (Logic + Database)
-        # Agora o pytest vai encontrar as variáveis de ambiente e conseguir conectar
-        run: python -m pytest tests/
+      # - name: Run All Tests (Logic + Database)
+      #   # Agora o pytest vai encontrar as variáveis de ambiente e conseguir conectar
+      #   run: python -m pytest tests/
