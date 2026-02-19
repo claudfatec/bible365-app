@@ -1,19 +1,28 @@
 import pytest
+import streamlit as st
 from core.engine import carregar_progresso, salvar_progresso
 
 def test_supabase_connection_and_persistence():
-    # 1. Guarda o dia original para não estragar o teu progresso real
+    # 1. Valor de teste único
+    test_day = 66 
+    
+    # Salva o original para restaurar depois
     dia_original = carregar_progresso()
     
-    # 2. Tenta salvar um valor temporário (ex: dia 999)
-    test_day = 66
     try:
+        # 2. Tenta salvar
         salvar_progresso(test_day)
         
-        # 3. Verifica se o banco realmente guardou esse valor
+        # 3. Limpa o cache do Streamlit para este teste específico
+        # Isso garante que a próxima leitura vá ao banco de fato
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        
+        # 4. Lê novamente
         confirmacao = carregar_progresso()
+        
         assert confirmacao == test_day
         
     finally:
-        # 4. Limpeza: Volta sempre para o dia original, mesmo que o teste falhe
+        # Restaura o dia real do usuário
         salvar_progresso(dia_original)
