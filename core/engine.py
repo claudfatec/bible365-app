@@ -1,35 +1,44 @@
-import json
-import os
-import re
+import streamlit as st
+from st_supabase_connection import SupabaseConnection
 
-CAMINHO_JORNADA = os.path.join('data', 'jornada.json')
-CAMINHO_SAVE = os.path.join('data', 'save.txt')
+def get_supabase_client():
+    # Conecta usando os segredos configurados no Streamlit Cloud ou .streamlit/secrets.toml
+    return st.connection("supabase", type=SupabaseConnection)
 
 def carregar_jornada():
-    with open(CAMINHO_JORNADA, 'r', encoding='utf-8') as f:
+    # Mantemos o carregamento do JSON local pois ele é o nosso "dicionário" estático
+    import json
+    with open('data/jornada.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def carregar_progresso():
-    if os.path.exists(CAMINHO_SAVE):
-        with open(CAMINHO_SAVE, 'r') as f:
-            return int(f.read())
-    return 1 # Começa no dia 1 se não houver progresso salvo
+    try:
+        supabase = get_supabase_client()
+        # Busca o dia_atual para o ID 1 (uso pessoal)
+        res = supabase.table("progresso").select("dia_atual").eq("id", 1).execute()
+        if res.data:
+            return res.data[0]['dia_atual']
+        return 1
+    except Exception:
+        return 1
 
-def salvar_progresso(dia):
-    with open(CAMINHO_SAVE, 'w') as f:
-        f.write(str(dia))
+def salvar_progresso(novo_dia):
+    try:
+        supabase = get_supabase_client()
+        # Atualiza o registo na nuvem
+        supabase.table("progresso").update({"dia_atual": novo_dia}).eq("id", 1).execute()
+    except Exception as e:
+        st.error(f"Erro ao salvar progresso: {e}")
 
 def expandir_trecho(trecho):
-    """
-    Converte 'Gn 1-3' em ['Gn 1', 'Gn 2', 'Gn 3']
-    """
-    # Procura pelo padrão: Nome do Livro + Espaço + Inicio + Hífen + Fim
-    match = re.search(r'(.+?)\s+(\d+)-(\d+)', trecho)
+    if not trecho or '-' not in trecho:
+        return [trecho] if trecho else [""]
     
-    if match:
-        livro = match.group(1)
-        inicio = int(match.group(2))
-        fim = int(match.group(3))
-        return [f"{livro} {cap}" for cap in range(inicio, fim + 1)]
-    
-    return [trecho] # Se não tiver hífen, retorna o próprio trecho em uma lista
+    try:
+        partes = trecho.split(' ')
+        livro = " ".join(partes[:-1])
+        caps = partes[-1].split('-')
+        inicio, fim = int(caps[0]), int(caps[1])
+        return [f"{livro} {i}" for i in range(inicio, fim + 1)]
+    except:
+        return [trecho]
